@@ -1,4 +1,4 @@
-# ChallengueAmigoSecreto
+# ChallengeAmigoSecreto
 Es un desafío,  para plasmar conocimiento que ha entregado Alura
 Este es un pequeño proyecto en JavaScript que permite a los usuarios agregar nombres de amigos y realizar un sorteo aleatorio para seleccionar un "Amigo Secreto".
 
