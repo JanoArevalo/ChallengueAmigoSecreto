@@ -1,33 +1,65 @@
 // El principal objetivo de este desafío es fortalecer tus habilidades en lógica de programación. Aquí deberás desarrollar la lógica para resolver el problema.
-let amigos = [];
+const amigos = [];
+const inputAmigo = document.querySelector("#amigo");
+const listaAmigos = document.querySelector("#listaAmigos");
+const resultado = document.querySelector("#resultado");
+const sonidoSorteo = new Audio("https://www.fesliyanstudios.com/play-mp3/2763");
 
-function agregarAmigo() {
-    let input = document.getElementById("amigo");
-    let nombre = input.value.trim();
+sonidoSorteo.load();
+document.addEventListener("click", () => (sonidoSorteo.muted = false));
 
-    if (nombre === "") {
-        alert("Por favor, inserte un nombre.");
-        return;
-    }
-
-    amigos.push(nombre);
-    input.value = "";
-    actualizarLista();
+function capturarNombre() {
+    return inputAmigo.value.trim();
 }
 
-function actualizarLista() {
-    let lista = document.getElementById("listaAmigos");
-    lista.innerHTML = "";
+function validarNombre(nombre) {
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$/;
+    
+    if (!nombre) {
+        alert("Por favor, inserte un nombre.");
+        return false;
+    }
+    if (!regex.test(nombre)) {
+        alert("El nombre solo puede contener letras y espacios.");
+        return false;
+    }
+    if (amigos.includes(nombre)) {
+        alert("Este nombre ya está en la lista.");
+        return false;
+    }
+    return true;
+}
 
-    for (let amigo of amigos) {
-        let li = document.createElement("li");
-        li.textContent = amigo;
-        lista.appendChild(li);
+function agregarAmigo() {
+    const nombre = capturarNombre();
+    
+    if (!validarNombre(nombre)) return;
+
+    amigos.push(nombre);
+    inputAmigo.value = "";
+    actualizarInterfaz();
+}
+
+function actualizarInterfaz() {
+    listaAmigos.innerHTML = amigos
+        .map(amigo => 
+            `<li class="amigo-item">
+                <span>${amigo}</span>
+                <button class="btn-eliminar" onclick="eliminarAmigo('${amigo}')">❌</button>
+            </li>`
+        )
+        .join("");
+}
+
+function eliminarAmigo(nombre) {
+    const index = amigos.indexOf(nombre);
+    if (index !== -1) {
+        amigos.splice(index, 1);
+        actualizarInterfaz();
     }
 }
 
 function sortearAmigo() {
-    let resultado = document.getElementById("resultado");
     resultado.innerHTML = "";
 
     if (amigos.length === 0) {
@@ -35,10 +67,27 @@ function sortearAmigo() {
         return;
     }
 
-    let indiceAleatorio = Math.floor(Math.random() * amigos.length);
-    let amigoSorteado = amigos[indiceAleatorio];
+    const indiceAleatorio = Math.floor(Math.random() * amigos.length);
+    const amigoSorteado = amigos[indiceAleatorio];
 
-    let li = document.createElement("li");
-    li.textContent = "Amigo secreto: " + amigoSorteado;
-    resultado.appendChild(li);
+    resultado.innerHTML = `<li>Amigo secreto: ${amigoSorteado}</li>`;
+
+    lanzarConfeti();
+    sonidoSorteo.play().catch(err => console.error("Error reproduciendo el sonido:", err));
 }
+
+function lanzarConfeti() {
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+}
+
+// Permitir agregar con Enter
+inputAmigo.addEventListener("keypress", event => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        agregarAmigo();
+    }
+});
